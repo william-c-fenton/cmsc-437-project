@@ -3,12 +3,17 @@
 # Email: wfenton1@umbc.edu
 
 # TODO LIST:
-# TODO: CREATE THE EXERCISE PAGE.
-# TODO: LEARN HOW TO INTEGRATE A SQLITE DATABASE.
-# TODO: FIND OUT HOW TO DYNAMICALLY UPDATE TKINTER FRAMES.
+# TODO: CREATE THE TABLE FOR EXERCISE DAYS.
+# TODO: ADD HELP TEXT.
+# TODO: ADD SOME ERROR CHECKING.
 
 import tkinter as tk
 from tkinter import font as tkfont
+from datetime import date
+import sqlite3
+
+from tools import *
+
 
 class App(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -34,7 +39,7 @@ class App(tk.Tk):
         # Set up the pages in the app.
         self.frames = {}
 
-        for F in (MainPage, HelpPage):
+        for F in (MainPage, HelpPage, TrackerPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -84,6 +89,19 @@ class MainPage(tk.Frame):
             activeforeground='red',
         )
         help_button.pack(side='bottom', fill='both', expand=False)
+
+        # Create the track button.
+        track_button = tk.Button(
+            self, 
+            text='Track Exercises',
+            font=controller.fonts['buttons'],
+            command=lambda: controller.show_frame('TrackerPage'),
+            bg='red',
+            fg='white',
+            activebackground='white',
+            activeforeground='red',
+        )
+        track_button.pack(side='bottom', fill='both', expand=False)
 
 class HelpPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -135,6 +153,99 @@ class HelpPage(tk.Frame):
         )
         help_label.pack(side='bottom', fill='x', expand=True)
 
+class TrackerPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.bg = 'white'
+        
+        # We will need to keep track of exercises we have added.
+        self.exercises = {}
+
+        self.exercise_frame = ScrollableFrame(self)
+        
+
+        # Create title label.
+        title_label = tk.Label(
+            self, 
+            text='Exercise Tracker', 
+            font=controller.fonts['title']
+        )
+        title_label.pack(side='top', fill='x', expand=False)
+
+        # Create subtitle label.
+        subtitle_label = tk.Label(
+            self, 
+            text=f'{date.today()}',
+            font=controller.fonts['body'],
+        )
+        subtitle_label.pack(side='top', fill='x', expand=False)
+
+        self.exercise_frame.pack(side='top', fill='x', expand=False)
+
+        # Create the back button.
+        back_button = tk.Button(
+            self, 
+            text='Back', 
+            command=lambda: controller.show_frame('MainPage'),
+            font=controller.fonts['buttons'],
+            bg='red',
+            fg='white',
+            activebackground='white',
+            activeforeground='red',
+        )
+        back_button.pack(side='bottom', fill='x', expand=False)
+
+        # Create the done button.
+        done_button = tk.Button(
+            self, 
+            text='Done',
+            command=None,
+            font=controller.fonts['buttons'],
+            bg='red',
+            fg='white',
+            activebackground='white',
+            activeforeground='red',
+        )
+        done_button.pack(side='bottom', fill='x', expand=False)
+
+        # Create the add exercise button.
+        add_button = tk.Button(
+            self,
+            text='Add Exercise',
+            command=lambda: self.add_exercise(),
+            font=controller.fonts['buttons'],
+            bg='red',
+            fg='white',
+            activebackground='white',
+            activeforeground='red',
+        )
+        add_button.pack(side='bottom', fill='x', expand=False)
+
+    # This method facilitates adding an exercise widget to the tracker page. 
+    def add_exercise(self):
+        entry_window = EntryWindow(self)
+
+
+def init_database():
+    conn = None
+    try:
+        conn = sqlite3.connect('exercises.db')
+        print(sqlite3.version)
+
+        c = conn.cursor()
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS exercises
+        ([exercise_id] INTEGER PRIMARY KEY AUTOINCREMENT, [exercise_name] TEXT NOT NULL UNIQUE)
+        ''')
+
+    except sqlite3.Error as e:
+        print(e)
+    finally:
+        if conn:
+            conn.close()
+
 if __name__ == '__main__':
+    init_database()
     app = App()
     app.mainloop()
