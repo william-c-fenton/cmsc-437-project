@@ -7,7 +7,9 @@ import sqlite3
 class ExerciseWidget(tk.Frame):
     def __init__(self, parent, controller, title):
         tk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
+        self.title = title
         self.bg = 'white'
 
         # Create title label.
@@ -32,11 +34,11 @@ class ExerciseWidget(tk.Frame):
         delete_button.pack(side='right', expand=False)
 
         # Create the reps count textbox.
-        reps_count_text = tk.Entry(
+        self.reps_count_text = tk.Entry(
             self, 
             width=2,
         )
-        reps_count_text.pack(side='right', expand=False)
+        self.reps_count_text.pack(side='right', expand=False)
 
         # Create the reps label.
         reps_label = tk.Label(
@@ -47,11 +49,11 @@ class ExerciseWidget(tk.Frame):
         reps_label.pack(side='right', expand=False)
 
         # Create the resistance textbox
-        res_count_text = tk.Entry(
+        self.res_count_text = tk.Entry(
             self, 
             width=2,
         )
-        res_count_text.pack(side='right', expand=False)
+        self.res_count_text.pack(side='right', expand=False)
 
         # Create the resistance label.
         res_label = tk.Label(
@@ -63,6 +65,7 @@ class ExerciseWidget(tk.Frame):
 
     # This method is used for deleting exercises.
     def destroy_exercise(self):
+        self.parent.exercises.pop(self.title)
         self.pack_forget()
         self.destroy()
 

@@ -141,10 +141,22 @@ class HelpPage(tk.Frame):
         # Create the help text.
         help_text = \
             '''
-            Lorem ipsum dolor sit amet, consectetur adipiscing el
-            it. Donec ornare neque a feugiat tristique. Suspendiss
-            e ultricies sem eu risus pellentesque interdum. Sed vu
-            lputate porttitor nibh...
+            This is a simple exercise tracker.
+
+            When you open this program, 
+            a database file will be created for you in the directory this file is stored in.
+
+
+            To get started, press the 'Track Exercises' button to go to the tracker page. 
+            You can add exercises to the page by pressing the 'Add Exercise' button on the tracker page. 
+            When you add, you will be prompted for a name. 
+            Enter either a new exercise or an exercise you have already done before.
+            If you enter a new exercise, you will add that exercise to the database and to the page. 
+            If you enter one you have already done before, it will just be added to the page. 
+            Once you have added all your exercises for the day, 
+            enter the resistance ('res') and repetitions ('reps') for your exercise.
+            Once you're done, you can press the 'Done' button 
+            to add all your exercise data (reps and resistance) to the database. 
             '''
         help_label = tk.Label(
             self, 
@@ -200,7 +212,7 @@ class TrackerPage(tk.Frame):
         done_button = tk.Button(
             self, 
             text='Done',
-            command=None,
+            command=lambda: self.finish_day(),
             font=controller.fonts['buttons'],
             bg='red',
             fg='white',
@@ -225,6 +237,30 @@ class TrackerPage(tk.Frame):
     # This method facilitates adding an exercise widget to the tracker page. 
     def add_exercise(self):
         entry_window = EntryWindow(self)
+    
+    def finish_day(self):
+        conn = sqlite3.connect('exercises.db')
+        
+
+        for f in self.exercises.values():
+            exercise_name = f.title
+            exercise_reps = f.reps_count_text.get()
+            exercise_res = f.res_count_text.get()
+            
+            # select the id from the given name.
+            c = conn.execute(f"SELECT exercise_id FROM exercises WHERE exercise_name='{exercise_name}'")
+
+            exercise_id = c.fetchone()[0]
+
+            c = conn.execute(f'''
+            INSERT INTO data (date, exercise_id, reps, resistance)
+
+                VALUES
+                ('{date.today()}', '{exercise_id}', '{exercise_reps}', '{exercise_res}')
+            ''')
+
+        conn.commit()
+        conn.close()
 
 
 def init_database():
@@ -236,9 +272,17 @@ def init_database():
         c = conn.cursor()
         c.execute('''
         CREATE TABLE IF NOT EXISTS exercises
-        ([exercise_id] INTEGER PRIMARY KEY AUTOINCREMENT, [exercise_name] TEXT NOT NULL UNIQUE)
+        ([exercise_id] INTEGER PRIMARY KEY AUTOINCREMENT, [exercise_name] TEXT NOT NULL UNIQUE);
         ''')
 
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS data
+        ([entry_id] INTEGER PRIMARY KEY AUTOINCREMENT,
+         [date] TEXT NOT NULL,
+         [exercise_id] INT NOT NULL, 
+         [reps] INT NOT NULL,
+         [resistance] INT NOT NULL);
+        ''')
     except sqlite3.Error as e:
         print(e)
     finally:
