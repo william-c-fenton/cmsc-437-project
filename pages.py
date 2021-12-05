@@ -3,8 +3,6 @@
 # Email: wfenton1@umbc.edu
 
 # TODO LIST:
-# TODO: CREATE THE TABLE FOR EXERCISE DAYS.
-# TODO: ADD HELP TEXT.
 # TODO: ADD SOME ERROR CHECKING.
 
 import tkinter as tk
@@ -146,7 +144,6 @@ class HelpPage(tk.Frame):
             When you open this program, 
             a database file will be created for you in the directory this file is stored in.
 
-
             To get started, press the 'Track Exercises' button to go to the tracker page. 
             You can add exercises to the page by pressing the 'Add Exercise' button on the tracker page. 
             When you add, you will be prompted for a name. 
@@ -157,6 +154,7 @@ class HelpPage(tk.Frame):
             enter the resistance ('res') and repetitions ('reps') for your exercise.
             Once you're done, you can press the 'Done' button 
             to add all your exercise data (reps and resistance) to the database. 
+            When you're done, simply close the window with the 'x' button.
             '''
         help_label = tk.Label(
             self, 
