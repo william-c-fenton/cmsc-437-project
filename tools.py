@@ -5,9 +5,10 @@ from tkinter import font as tkfont
 import sqlite3
 
 class ExerciseWidget(tk.Frame):
-    def __init__(self, parent, controller, title):
+    def __init__(self, parent, parent_frame, controller, title):
         tk.Frame.__init__(self, parent)
         self.parent = parent
+        self.parent_frame = parent_frame
         self.controller = controller
         self.title = title
         self.bg = 'white'
@@ -65,7 +66,7 @@ class ExerciseWidget(tk.Frame):
 
     # This method is used for deleting exercises.
     def destroy_exercise(self):
-        self.parent.exercises.pop(self.title)
+        self.parent_frame.exercises.pop(self.title)
         self.pack_forget()
         self.destroy()
 
@@ -121,6 +122,7 @@ class EntryWindow(tk.Toplevel):
         if name not in self.parent.exercises.keys():
             exercise = ExerciseWidget(
                 parent=self.parent.exercise_frame.scrollable_frame, 
+                parent_frame= self.parent,
                 controller=self.parent.controller,
                 title=name
                 )

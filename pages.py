@@ -174,7 +174,6 @@ class TrackerPage(tk.Frame):
 
         self.exercise_frame = ScrollableFrame(self)
         
-
         # Create title label.
         title_label = tk.Label(
             self, 
